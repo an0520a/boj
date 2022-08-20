@@ -1,80 +1,133 @@
 #include <cstdio>
 #include <cmath>
+#include <vector>
 
+typedef int i32;
 typedef unsigned int u32;
-typedef unsigned long long u64;
 typedef long long i64;
-class point
+typedef unsigned long long u64;
+
+class Point
 {
 public:
-    int x;
-    int y;
-
-    point operator+(const point& p) const { return {x + p.x, y + p.y}; }
-    point operator+=(const point& p) { x += p.x, y += p.y; return *this; }
-    point operator-(const point& p) const { return {x - p.x, y - p.y}; }
-    point operator-=(const point& p) { x -= p.x, y -= p.y; return *this; }
-    u64 size() { return (u64)((i64)x * (i64)x + (i64)y * (i64)y); }
+    i64 x;
+    i64 y;
+private:
 };
 
-using namespace std;
+class Vector
+{
+public:
+    Vector();
+    Vector(i64 _x, i64 _y);
+    Vector(Point _u, Point _v);
+    double size() const;
+    double length() const;
+    Vector operator+(const Vector& v) const;
+    Vector operator-(const Vector& v) const;
+    Vector& operator+=(const Vector& v);
+    Vector& operator-=(const Vector& v);
 
-point combinationMin(point *arr, u32 size);
-void combinationMin_cmp(point *arr, u32 n, u32 k, point sum, point& min);
+    i64 x;
+    i64 y;
+private:
+};
+
+Vector GetMinSumVector(const std::vector<Point>& point_vec);
 
 int main()
 {
-    u32 T;
-    point arr[20];
+    u64 T;
 
-    scanf(" %u", &T);
+    scanf(" %llu", &T);
 
     while(T--)
     {
         u32 N;
-        point result = { 0x7FFFFFFF, 0x7FFFFFFF };
 
         scanf(" %u", &N);
 
-        for (u32 i = 0; i < N; i++)
+        std::vector<Point> point_vec;
+        point_vec.reserve(N);
+
+        for (size_t i = 0; i < N; i++)
         {
-            int x;
-            int y;
+            i64 x, y;
 
-            scanf(" %d %d", &x, &y);
+            scanf(" %lld %lld", &x, &y);
 
-            arr[i] = { x, y };
+            point_vec.push_back({x, y});
         }
 
-        point min = combinationMin(arr, N);
-
-        printf("%.12lf\n", sqrt(min.size()));
+        Vector get_vector = GetMinSumVector(point_vec);
+        printf("%.12lf", get_vector.size());
     }
-
 }
 
-point combinationMin(point *arr, u32 size)
+Vector::Vector() : x(0), y(0) {}
+Vector::Vector(i64 _x, i64 _y) : x(_x), y(_y) {}
+Vector::Vector(Point _u, Point _v) : x(_v.x - _u.x), y(_v.y - _u.y) {}
+
+double Vector::size() const
 {
-    point min = { 0x7FFFFFFF, 0x7FFFFFFF };
-
-    combinationMin_cmp(arr, size, size / 2, {0, 0}, min);
-
-    return min;
+    return std::sqrt((double)x * (double)x + (double)y * (double)y);
 }
 
-void combinationMin_cmp(point *arr, u32 n, u32 k, point sum, point& min)
+double Vector::length() const { return size(); }
+
+Vector Vector::operator+(const Vector& v) const
 {
-    if (k == 0)
+    return Vector(x + v.x, y + v.y);
+}
+
+Vector Vector::operator-(const Vector& v) const
+{
+    return Vector(x - v.x, y - v.y);
+}
+
+Vector& Vector::operator+=(const Vector& v)
+{
+    x += v.x;
+    y += v.y;
+    return *this;
+}
+
+Vector& Vector::operator-=(const Vector& v)
+{
+    x -= v.x;
+    y -= v.y;
+    return *this;
+}
+
+Vector GetMinSumVector(const std::vector<Point>& point_vec)
+{
+    if(point_vec.size() % 2 != 0) throw("error");
+    else if(point_vec.size() == 2)
     {
-        for (u32 i = 0; i < n; i++) sum -= arr[i];
-        min = (sum.size() < min.size())? sum : min;
+        return Vector(point_vec[0], point_vec[1]);
     }
     else
     {
-        for (u32 i = 0; i <= n - k; i++)
+        std::vector<Point> tmp_vec = point_vec;
+        Vector lowest_length_vector = { 0x7FFFFFFF, 0x7FFFFFFF };
+
+        Point u = tmp_vec.back();
+        tmp_vec.pop_back();
+
+        for (size_t i = 0; i < tmp_vec.size(); i++)
         {
-            combinationMin_cmp(arr + (i + 1), n - (i + 1), k - 1, sum + arr[i], min);
-            sum -= arr[i];
+            Point v = tmp_vec[i];
+            Vector vector = { u, v };
+            tmp_vec.erase(tmp_vec.begin() + i);
+
+
+            Vector next_lowest_length_vector = GetMinSumVector(tmp_vec);
+            Vector tmp_lowest_length_vector = ((vector + next_lowest_length_vector).size() < (vector - next_lowest_length_vector).size())? vector + next_lowest_length_vector : vector - next_lowest_length_vector;
+            lowest_length_vector = (lowest_length_vector.length() < tmp_lowest_length_vector.size())? lowest_length_vector : tmp_lowest_length_vector;
+
+            tmp_vec.insert(tmp_vec.begin() + i, v);
         }
+
+        return lowest_length_vector;
     }
 }
