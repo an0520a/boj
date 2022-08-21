@@ -4,77 +4,85 @@
 typedef unsigned int u32;
 typedef unsigned long long u64;
 typedef long long i64;
-class point
-{
-public:
-    int x;
-    int y;
 
-    point operator+(const point& p) const { return {x + p.x, y + p.y}; }
-    point operator+=(const point& p) { x += p.x, y += p.y; return *this; }
-    point operator-(const point& p) const { return {x - p.x, y - p.y}; }
-    point operator-=(const point& p) { x -= p.x, y -= p.y; return *this; }
-    u64 size() { return (u64)((i64)x * (i64)x + (i64)y * (i64)y); }
-};
-
-using namespace std;
-
-point combinationMin(point *arr, u32 size);
-void combinationMin_cmp(point *arr, u32 n, u32 k, point sum, point& min);
+template <typename T>
+T* LowerBound(T* begin, T* end, T& val);
 
 int main()
 {
-    u32 T;
-    point arr[20];
+    int arr1[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+    int arr2[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
+    int arr3[] = {1};
+    int arr4[] = {1, 2};
+    int arr5[] = {1, 2, 3};
 
-    scanf(" %u", &T);
-
-    while(T--)
+    for (int i = 0; i <= 11; i++)
     {
-        u32 N;
-        point result = { 0x7FFFFFFF, 0x7FFFFFFF };
+        auto tmp = LowerBound(arr1, arr1 + sizeof(arr1) / sizeof(int), i);
 
-        scanf(" %u", &N);
+        if(tmp != nullptr) printf(" %d\n", tmp - arr1);
+        else               printf("none\n");
+    }
 
-        for (u32 i = 0; i < N; i++)
-        {
-            int x;
-            int y;
+    for (int i = 0; i <= 12; i++)
+    {
+        auto tmp = LowerBound(arr2, arr2 + sizeof(arr2) / sizeof(int), i);
 
-            scanf(" %d %d", &x, &y);
+        if(tmp != nullptr) printf(" %d\n", tmp - arr2);
+        else               printf("none\n");
+    }
 
-            arr[i] = { x, y };
-        }
+    for (int i = 0; i <= 4; i++)
+    {
+        auto tmp = LowerBound(arr3, arr3 + sizeof(arr3) / sizeof(int), i);
 
-        point min = combinationMin(arr, N);
+        if(tmp != nullptr) printf(" %d\n", tmp - arr3);
+        else               printf("none\n");
+    }
 
-        printf("%.12lf\n", sqrt(min.size()));
+    for (int i = 0; i <= 11; i++)
+    {
+        auto tmp = LowerBound(arr4, arr4 + sizeof(arr4) / sizeof(int), i);
+
+        if(tmp != nullptr) printf(" %d\n", tmp - arr4);
+        else               printf("none\n");
+    }
+
+    for (int i = 0; i <= 11; i++)
+    {
+        auto tmp = LowerBound(arr5, arr5 + sizeof(arr5) / sizeof(int), i);
+
+        if(tmp != nullptr) printf(" %d\n", tmp - arr5);
+        else               printf("none\n");
     }
 
 }
 
-point combinationMin(point *arr, u32 size)
+template <typename T>
+T* LowerBound(T* begin, T* end, T& val)
 {
-    point min = { 0x7FFFFFFF, 0x7FFFFFFF };
-
-    combinationMin_cmp(arr, size, size / 2, {0, 0}, min);
-
-    return min;
-}
-
-void combinationMin_cmp(point *arr, u32 n, u32 k, point sum, point& min)
-{
-    if (k == 0)
+    if (begin == end)
     {
-        for (u32 i = 0; i < n; i++) sum -= arr[i];
-        min = (sum.size() < min.size())? sum : min;
+        return nullptr;
     }
-    else
+
+    T* check = end;
+    end--;
+
+    while (begin <= end)
     {
-        for (u32 i = 0; i <= n - k; i++)
+        T* mid = begin + ((end - begin) / 2);
+
+        if (*mid < val)
         {
-            combinationMin_cmp(arr + (i + 1), n - (i + 1), k - 1, sum + arr[i], min);
-            sum -= arr[i];
+            begin = mid + 1;
+        }
+        else
+        {
+            end = mid - 1;
         }
     }
+    
+    if (begin != check) return begin;
+    else                return nullptr;
 }
