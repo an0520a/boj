@@ -124,6 +124,6 @@ int main()
 
     printf("%u\n", time_of_melting_chese - 1);
 
-    delete[] visited;
-    delete[] chese_map;
+    free(visited);
+    free(chese_map);
 }
