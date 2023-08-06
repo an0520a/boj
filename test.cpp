@@ -2,7 +2,7 @@
 
 int main(int argc, const char* argv[])
 {
-    char str1[1024] = { '\0', 'A', 'A', 'A, 'A', 'A' };
+    char str1[1024] = { '\0', 'A', 'A', 'A', 'A', 'A' };
     char str2[1024] = { '\0' };
 
     size_t str1_len = 37;

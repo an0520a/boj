@@ -16,8 +16,8 @@ void getWireDelete(pair<u32, u32>* arr, u32 size);
 template <typename T>
 T* lowerBound(T* begin, T* end, T val);
 
-template <typename T, typename Compare>
-T* lowerBound(T* begin, T* end, T val, Compare c);
+template <typename T, typename Calc>
+T* lowerBound(T* begin, T* end, T val, Calc c);
 
 
 int main()
@@ -137,8 +137,8 @@ T* lowerBound(T* begin, T* end, T val)
     return end;
 }
 
-template <typename T, typename Compare>
-T* lowerBound(T* begin, T* end, T val, Compare c)
+template <typename T, typename Calc>
+T* lowerBound(T* begin, T* end, T val, Calc c)
 {
     end--;
     
